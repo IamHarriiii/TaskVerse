@@ -18,30 +18,30 @@ class TaskCreateInput(TaskBaseSchema):
     
     @field_validator("title")
     @classmethod
-    def validate_title(cls, v: str) -> str:
-        if not v.strip():
+    def validate_title(cls, name: str) -> str:
+        if not name.strip():
             raise ValueError("Title cannot be empty or whitespace")
-        return v.strip()
+        return name.strip()
     
     @field_validator("description")
     @classmethod
-    def validate_description(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None:
-            stripped = v.strip()
+    def validate_description(cls, description: Optional[str]) -> Optional[str]:
+        if description is not None:
+            stripped = description.strip()
             return stripped if stripped else None
-        return v
+        return description
     
     @field_validator("due_date")
     @classmethod
-    def validate_due_date_is_future(cls, value: datetime) -> datetime:
+    def validate_due_date_is_future(cls, time: datetime) -> datetime:
         now = datetime.now(timezone.utc)
 
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
+        if time.tzinfo is None:
+            time = time.replace(tzinfo=timezone.utc)
         
-        if value <= now:
+        if time <= now:
             raise ValueError("due_date must be a future datetime")
-        return value
+        return time
 
 
 class TaskUpdateInput(BaseModel):
@@ -53,32 +53,32 @@ class TaskUpdateInput(BaseModel):
     
     @field_validator("title")
     @classmethod
-    def validate_title(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None:
-            if not v.strip():
+    def validate_title(cls, name: Optional[str]) -> Optional[str]:
+        if name is not None:
+            if not name.strip():
                 raise ValueError("Title cannot be empty or whitespace")
-            return v.strip()
-        return v
+            return name.strip()
+        return name
     
     @field_validator("description")
     @classmethod
-    def validate_description(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None:
-            stripped = v.strip()
+    def validate_description(cls, description: Optional[str]) -> Optional[str]:
+        if description is not None:
+            stripped = description.strip()
             return stripped if stripped else None
-        return v
+        return description
     
     @field_validator("due_date")
     @classmethod
-    def validate_updated_due_date_is_future(cls, value: Optional[datetime]) -> Optional[datetime]:
-        if value is not None:
+    def validate_updated_due_date_is_future(cls, time: Optional[datetime]) -> Optional[datetime]:
+        if time is not None:
             now = datetime.now(timezone.utc)
-            if value.tzinfo is None:
-                value = value.replace(tzinfo=timezone.utc)
+            if time.tzinfo is None:
+                time = time.replace(tzinfo=timezone.utc)
             
-            if value <= now:
+            if time <= now:
                 raise ValueError("due_date must be a future datetime")
-        return value
+        return time
 
 
 class TaskResponse(TaskBaseSchema):
