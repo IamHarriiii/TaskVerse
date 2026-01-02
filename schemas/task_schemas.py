@@ -14,7 +14,6 @@ class TaskBaseSchema(BaseModel):
 
 
 class TaskCreateInput(TaskBaseSchema):
-    """Input schema for creating a task."""
     user_id: UUID
     
     @field_validator("title")
@@ -46,7 +45,6 @@ class TaskCreateInput(TaskBaseSchema):
 
 
 class TaskUpdateInput(BaseModel):
-    """Input schema for updating a task. All fields are optional."""
     title: Optional[str] = Field(default=None, min_length=3, max_length=200)
     description: Optional[str] = None
     priority: Optional[int] = Field(default=None, ge=1, le=5)
@@ -84,7 +82,6 @@ class TaskUpdateInput(BaseModel):
 
 
 class TaskResponse(TaskBaseSchema):
-    """Output schema returned by task APIs."""
     id: UUID
     user_id: UUID
     created_at: datetime

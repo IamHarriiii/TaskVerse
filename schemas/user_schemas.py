@@ -11,44 +11,40 @@ class UserBase(BaseModel):
 
 
 class UserCreateInput(UserBase):
-    """Schema for creating a new user."""
-
     @field_validator('name')
     @classmethod
-    def validate_name(cls, v: str) -> str:
-        if not v.strip():
+    def validate_name(cls, name: str) -> str:
+        if not name.strip():
             raise ValueError("Name cannot be empty or whitespace")
-        return v.strip()
+        return name.strip()
     
     @field_validator('email')
     @classmethod
-    def validate_email(cls, v: str) -> str:
-        return v.lower().strip()
+    def validate_email(cls, email: str) -> str:
+        return email.lower().strip()
 
 
 class UserUpdateInput(BaseModel):
-    """Schema for updating an existing user."""
     name: Optional[str] = Field(default=None, min_length=2, max_length=100)
     email: Optional[EmailStr] = None
 
     @field_validator('name')
     @classmethod
-    def validate_name(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None:
-            if not v.strip():
+    def validate_name(cls, name: Optional[str]) -> Optional[str]:
+        if name is not None:
+            if not name.strip():
                 raise ValueError("Name cannot be empty or whitespace")
-            return v.strip()
-        return v
+            return name.strip()
+        return name
     
     @field_validator('email')
     @classmethod
-    def validate_email(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None:
-            return v.lower().strip()
-        return v
+    def validate_email(cls, email: Optional[str]) -> Optional[str]:
+        if email is not None:
+            return email.lower().strip()
+        return email
 
 
 class UserResponse(UserBase):
-    """Schema for user responses."""
     id: UUID
     created_at: datetime
