@@ -1,0 +1,41 @@
+{
+  "users": [
+    {
+      "id": "cbafdd11-5426-42c0-85b0-fe2d4a90127c",
+      "created_at": "2026-01-02 10:13:09.252813+00:00",
+      "name": "hari",
+      "email": "hari@gmail.com"
+    },
+    {
+      "id": "f434ec86-85c8-4321-979b-22b89aab0e3f",
+      "created_at": "2026-01-02 10:15:38.002590+00:00",
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    {
+      "id": "d9fc3879-936b-4f0f-abff-f5e7c4be1516",
+      "created_at": "2026-01-02 10:21:19.158585+00:00",
+      "name": "kunjumon",
+      "email": "kunjumon@yahoo.com"
+    },
+    {
+      "id": "fc4b940f-a852-4b7d-9de7-7cfec981063b",
+      "created_at": "2026-01-02 10:29:31.747548+00:00",
+      "name": "Bob",
+      "email": "bob@example.com"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "45848d3b-1c74-4336-b16f-5e5c858ce9e8",
+      "created_at": "2026-01-02 10:22:42.452583+00:00",
+      "user_id": "d9fc3879-936b-4f0f-abff-f5e7c4be1516",
+      "title": "complete the plumbing project",
+      "description": null,
+      "priority": 3,
+      "status": "pending",
+      "due_date": "2026-01-03 00:00:00+00:00",
+      "updated_at": "2026-01-02 10:22:42.452588+00:00"
+    }
+  ]
+}

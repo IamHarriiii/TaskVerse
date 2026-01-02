@@ -1,5 +1,5 @@
 from pydantic import EmailStr, Field
-from base import BaseDomainModal
+from models.base import BaseDomainModal
 
 class User(BaseDomainModal):
     """

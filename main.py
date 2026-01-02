@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from services.user_service import user_router
-from services.task_service import task_router
+from routes.task_routes import router as task_router
+from routes.user_routes import router as user_router
 
 app = FastAPI(
     title = "User Task Management API",

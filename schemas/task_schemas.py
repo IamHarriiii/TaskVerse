@@ -47,7 +47,7 @@ class TaskCreateInput(TaskBaseSchema):
 class TaskUpdateInput(BaseModel):
     title: Optional[str] = Field(default=None, min_length=3, max_length=200)
     description: Optional[str] = None
-    priority: Optional[int] = Field(default=None, ge=1, le=5)
+    priority: Literal[1, 2, 3, 4, 5] | None = None
     status: Optional[Literal["pending", "in_progress", "done"]] = None
     due_date: Optional[datetime] = None
     

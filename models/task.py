@@ -4,7 +4,7 @@ from typing import Literal
 from uuid import UUID
 from models.base import BaseDomainModal
 
-class TaskModel(BaseDomainModal):
+class Task(BaseDomainModal):
     """
     Internal Task domain model.
     Represents how tasks are stored in the system.

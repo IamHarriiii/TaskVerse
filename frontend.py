@@ -3,6 +3,7 @@ import requests
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any, Optional # type: ignore
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # ---------------- CONFIG ---------------- #
 API_BASE_URL = "http://localhost:8000"
@@ -409,7 +410,11 @@ with tab_analytics:
                 list(status_counts.items()),
                 columns=["Status", "Count"]
             )
-            st.bar_chart(status_df.set_index("Status"))
+            fig, ax = plt.subplots()
+ax.bar(status_df["Status"], status_df["Count"])
+ax.set_xlabel("Status")
+ax.set_ylabel("Count")
+st.pyplot(fig)
         
         with col2:
             st.subheader("Priority Distribution")
@@ -422,7 +427,11 @@ with tab_analytics:
                 list(priority_counts.items()),
                 columns=["Priority", "Count"]
             )
-            st.bar_chart(priority_df.set_index("Priority"))
+            fig2, ax2 = plt.subplots()
+ax2.bar(priority_df["Priority"], priority_df["Count"])
+ax2.set_xlabel("Priority")
+ax2.set_ylabel("Count")
+st.pyplot(fig2)
         
         # Tasks per user
         st.divider()
