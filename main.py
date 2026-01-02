@@ -11,7 +11,7 @@ app = FastAPI(
 app.include_router(user_router, prefix = "/users", tags = ["Users"])
 app.include_router(task_router, prefix = "/tasks", tags = ["Tasks"])
 
-@app.get("/")
+@app.get("/", tags=["Health Check"])
 def healthCheck():
     return {
         "status": "ok",
