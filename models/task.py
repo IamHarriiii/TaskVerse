@@ -10,7 +10,7 @@ class Task(BaseDomainModal):
     Represents how tasks are stored in the system.
     """
     user_id: UUID
-    title: str = Field(min_length=3, max_length=50)
+    title: str = Field(min_length=3, max_length=200)
     description: str | None = None
     priority: Literal[1, 2, 3, 4, 5] = 3
     status: Literal['pending', 'done', 'in_progress']

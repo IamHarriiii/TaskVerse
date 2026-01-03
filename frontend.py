@@ -66,15 +66,14 @@ def delete_task(task_id: str) -> bool:
         return False
 
 
-def update_task_status(task_id: str, status: str) -> bool:
+def update_task(task_id: str, updates: Dict[str, Any]) -> bool:
     try:
-        payload: Dict[str, Any] = {"status": status}
         r = requests.put(
             f"{API_BASE_URL}/tasks/{task_id}",
-            json=payload,
+            json=updates,
             timeout=5,
         )
-        return handle_api_error(r, f"Task marked as {status} ✅")
+        return handle_api_error(r, "Task updated successfully ✅")
     except requests.RequestException as e:
         st.error(str(e))
         return False
@@ -239,18 +238,38 @@ with tab_tasks:
             task_label = st.selectbox(
                 "Update Task",
                 task_map.keys(),
+                key="update_task_select"
             )
-            new_status = st.selectbox(
-                "New Status",
-                ["pending", "in_progress", "done"],
-            )
-            if st.button("Update Status"):
-                if update_task_status(
-                    task_map[task_label],
-                    new_status,
-                ):
-                    st.cache_data.clear()
-                    st.rerun()
+            selected_task_id = task_map[task_label]
+            selected_task = next(t for t in tasks if t["id"] == selected_task_id)
+
+            with st.expander("Edit Task Details", expanded=True):
+                new_title = st.text_input("New Title", value=selected_task["title"])
+                new_desc = st.text_area("New Description", value=selected_task["description"] or "")
+                new_status = st.selectbox(
+                    "New Status",
+                    ["pending", "in_progress", "done"],
+                    index=["pending", "in_progress", "done"].index(selected_task["status"])
+                )
+                new_priority = st.slider("New Priority", 1, 5, value=selected_task["priority"])
+                
+                if st.button("Save Changes", use_container_width=True):
+                    updates = {}
+                    if new_title != selected_task["title"]:
+                        updates["title"] = new_title
+                    if new_desc != (selected_task["description"] or ""):
+                        updates["description"] = new_desc if new_desc.strip() else None
+                    if new_status != selected_task["status"]:
+                        updates["status"] = new_status
+                    if new_priority != selected_task["priority"]:
+                        updates["priority"] = new_priority
+                    
+                    if updates:
+                        if update_task(selected_task_id, updates):
+                            st.cache_data.clear()
+                            st.rerun()
+                    else:
+                        st.info("No changes detected")
 
         with col2:
             del_task = st.selectbox(
