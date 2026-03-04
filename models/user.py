@@ -1,7 +1,7 @@
 from pydantic import EmailStr, Field
-from models.base import BaseDomainModal
+from models.base import BaseDomainModel
 
-class User(BaseDomainModal):
+class User(BaseDomainModel):
     """
     Internal User domain model.
     Represents how users are stored in the system.

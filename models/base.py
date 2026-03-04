@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
-class BaseDomainModal(BaseModel):
+class BaseDomainModel(BaseModel):
     """Base class for entities like Task and User.
 
     Provides common system-managed fields such as unique identifiers 

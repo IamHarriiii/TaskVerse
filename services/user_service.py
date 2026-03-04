@@ -1,67 +1,79 @@
-import json
-from pathlib import Path
+"""User service — business logic for user CRUD operations."""
+
+import logging
 from typing import List, Any
 from uuid import UUID
 
 from models.user import User
-from schemas.user_schemas import UserCreateInput
+from schemas.user_schemas import UserCreateInput, UserUpdateInput
+from services.storage_service import StorageService
+from exceptions import NotFoundError, DuplicateError
 
-DATA_FILE_PATH = Path("storage/data.json")
+logger = logging.getLogger("taskverse.services.user")
+
 
 class UserService:
     def __init__(self) -> None:
-        self._ensure_data_file_exists()
-
-    def _ensure_data_file_exists(self) -> None:
-        if not DATA_FILE_PATH.exists():
-            DATA_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-            with open(DATA_FILE_PATH, "w") as file:
-                json.dump({"users": [], "tasks": []}, file)
-
-    def _load_data(self) -> dict[str, Any]:
-        if not DATA_FILE_PATH.exists():
-            # If the file does not exist, treat as empty data
-            return {"users": [], "tasks": []}
-        try:
-            with open(DATA_FILE_PATH, "r") as file:
-                return json.load(file)
-        except json.JSONDecodeError:
-            # Corrupted or empty file – reset to empty structure
-            return {"users": [], "tasks": []}
-        
-    def _save_data(self, data: dict[str, Any]) -> None:
-        with open(DATA_FILE_PATH, "w") as file:
-            json.dump(data, file, default=str, indent=2)
+        StorageService._ensure_file()
 
     def create_user(self, user_input: UserCreateInput) -> User:
-        data = self._load_data()
-        # Check for duplicate email
+        data = StorageService.load()
+
         if any(u["email"] == user_input.email for u in data["users"]):
-            from fastapi import HTTPException, status
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+            raise DuplicateError("Email", user_input.email)
+
         new_user = User(**user_input.model_dump())
-        users_list: list[dict[str, Any]] = data["users"]
-        users_list.append(new_user.model_dump())
-        self._save_data(data)
+        data["users"].append(new_user.model_dump())
+        StorageService.save(data)
+        logger.info("Created user %s (%s)", new_user.name, new_user.id)
         return new_user
 
     def get_all_users(self) -> List[User]:
-        data = self._load_data()
+        data = StorageService.load()
         return [User(**user) for user in data["users"]]
 
-    def get_user_by_id(self, user_id: UUID) -> User | None:
-        data = self._load_data()
+    def get_user_by_id(self, user_id: UUID) -> User:
+        data = StorageService.load()
         for user in data["users"]:
             if user["id"] == str(user_id):
                 return User(**user)
-        return None
+        raise NotFoundError("User", str(user_id))
+
+    def update_user(self, user_id: UUID, user_input: UserUpdateInput) -> User:
+        data = StorageService.load()
+
+        for user in data["users"]:
+            if user["id"] == str(user_id):
+                updates = user_input.model_dump(exclude_unset=True)
+
+                # Check for duplicate email if email is being changed
+                if "email" in updates:
+                    if any(
+                        u["email"] == updates["email"] and u["id"] != str(user_id)
+                        for u in data["users"]
+                    ):
+                        raise DuplicateError("Email", updates["email"])
+
+                for key, value in updates.items():
+                    user[key] = value
+
+                StorageService.save(data)
+                logger.info("Updated user %s", user_id)
+                return User(**user)
+
+        raise NotFoundError("User", str(user_id))
 
     def delete_user(self, user_id: UUID) -> bool:
-        data = self._load_data()
+        data = StorageService.load()
         users = data["users"]
         for i, user in enumerate(users):
             if user["id"] == str(user_id):
+                # Cascade delete: remove all tasks belonging to this user
+                data["tasks"] = [
+                    t for t in data["tasks"] if t["user_id"] != str(user_id)
+                ]
                 del users[i]
-                self._save_data(data)
+                StorageService.save(data)
+                logger.info("Deleted user %s and their tasks", user_id)
                 return True
-        return False
+        raise NotFoundError("User", str(user_id))
